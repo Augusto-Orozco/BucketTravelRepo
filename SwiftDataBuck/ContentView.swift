@@ -6,19 +6,37 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    //var travelgoals : [TravelGoal] = []
+    @State private var isShowingItemSheet = false
+    @Query(sort: \TravelGoal.dateAdded) var travelgoals : [TravelGoal]
+    
+    
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            List{
+                ForEach(travelgoals){ travelgoal in
+                    Text(travelgoal.name)
+                }
+            }
+            .navigationTitle("Travel Goals")
+            .navigationBarTitleDisplayMode( .large)
+            .sheet(isPresented: $isShowingItemSheet){
+                AddTravelGoalSheet()
+            }
+            .toolbar{
+                Button("Add", systemImage: "plus"){
+                    isShowingItemSheet = true
+                }
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: [TravelGoal.self], inMemory: true)
 }
