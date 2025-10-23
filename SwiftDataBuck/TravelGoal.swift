@@ -19,4 +19,8 @@ class TravelGoal {
         self.dateAdded = dateAdded
         self.visited = visited
     }
+    
+    static func isValidName(_ name: String ) -> Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 }
