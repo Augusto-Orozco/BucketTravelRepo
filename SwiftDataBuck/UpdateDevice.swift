@@ -15,27 +15,45 @@ struct UpdateDevice: View {
     @Environment(\.modelContext) var context
     @Bindable var devicePurchased : Devices
     
+    let items = ["Amazon Echo", "Luz", "Enchufe", "TV", "Bocina", "Audifonos", "Consola de Videojuegos"]
     
     var body: some View {
-        NavigationStack {
-            Form{
-                TextField("Name of the device", text:$devicePurchased.name)
-                DatePicker("Date of purchase", selection: $devicePurchased.dateAdded, displayedComponents: .date)
-                TextField("Type of device", text: $devicePurchased.typeOf)
-                Toggle("Require Wifi", isOn: $devicePurchased.requireWifi)
-            }
-            .navigationTitle("Update Devices")
-            .navigationBarTitleDisplayMode( .large)
-            .toolbar{
-                ToolbarItem(placement: .topBarLeading){
-                    Button("Cancel"){
-                        dismiss()
+        ZStack{
+            Image("Fondo2")
+                .resizable()
+                .ignoresSafeArea()
+                .blur(radius: 5)
+                .opacity(0.6)
+            
+            NavigationStack {
+                VStack(spacing: 15){
+                    Form{
+                        TextField("Name of the device", text:$devicePurchased.name)
+                        DatePicker("Date of purchase", selection: $devicePurchased.dateAdded, displayedComponents: .date)
+                        Picker("Dispositivo", selection: $devicePurchased.typeOf) {
+                            ForEach(items, id: \.self) { items in
+                                Text(items)
+                            }
+                        }
+                        Toggle("Require Wifi", isOn: $devicePurchased.requireWifi)
                     }
-                }
-                ToolbarItem(placement: .topBarTrailing){
-                    Button("Done"){
-                        try! context.save()
-                        dismiss()
+                    .scrollContentBackground(.hidden)
+                    .background(.ultraThinMaterial)
+                    
+                    .navigationTitle("Update Device")
+                    .navigationBarTitleDisplayMode( .large)
+                    .toolbar{
+                        ToolbarItem(placement: .topBarLeading){
+                            Button("Cancel"){
+                                dismiss()
+                            }
+                        }
+                        ToolbarItem(placement: .topBarTrailing){
+                            Button("Done"){
+                                try! context.save()
+                                dismiss()
+                            }
+                        }
                     }
                 }
             }

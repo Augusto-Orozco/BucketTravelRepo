@@ -11,45 +11,65 @@ import SwiftData
 struct AddDevice: View {
     
     @Environment(\.dismiss) private var dismiss
-    
     @Environment(\.modelContext) var context
     @State private var name : String = ""
     @State private var dateAdded : Date = .now
-    @State private var TypeOf : String = ""
+    @State private var seleccion: String = ""
     @State private var RequireWifi : Bool = false
     
+    let items = ["Amazon Echo", "Luz", "Enchufe", "TV", "Bocina", "Audifonos", "Consola de Videojuegos"]
     
     var body: some View {
-        NavigationStack {
-            Form{
-                TextField("Name of the device", text:$name)
-                DatePicker("Date of purchase", selection: $dateAdded, displayedComponents: .date)
-                TextField("Type of device", text: $TypeOf)
-                Toggle("Require Wifi", isOn: $RequireWifi)
-            }
-            .navigationTitle("Add Device")
-            .navigationBarTitleDisplayMode( .large)
-            .toolbar{
-                ToolbarItem(placement: .topBarLeading){
-                    Button("Cancel"){
-                        dismiss()
+        ZStack {
+            Image("Fondo")
+                .resizable()
+                .ignoresSafeArea()
+                .blur(radius: 5)
+                .opacity(0.6)
+            
+            NavigationStack{
+                VStack(spacing: 15){
+                    Form {
+                        TextField("Name of the device", text:$name)
+                        DatePicker("Date of purchase", selection: $dateAdded, displayedComponents: .date)
+                        Picker("Dispositivo", selection: $seleccion) {
+                            ForEach(items, id: \.self) { item in
+                                Text(item)
+                            }
+                        }
+                        Toggle("Require Wifi", isOn: $RequireWifi)
                     }
-                }
-                ToolbarItem(placement: .topBarTrailing){
-                    Button("Save"){
-                        let devicePurchased = Devices(name: name, dateAdded: dateAdded, typeOf: TypeOf, requireWifi: RequireWifi)
-                        
-                        context
-                            .insert(devicePurchased)
-                        
-                        try! context.save()
-                        dismiss()
+                    .scrollContentBackground(.hidden)
+                    .background(.ultraThinMaterial)
+                    
+                    .navigationTitle("Add Device")
+                    .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading){
+                            Button("Cancel") {
+                                dismiss()
+                            }
+                        }
+                        ToolbarItem(placement: .topBarTrailing){
+                            Button("Save") {
+                                let devicePurchased = Devices(
+                                    name: name,
+                                    dateAdded: dateAdded,
+                                    typeOf: seleccion,
+                                    requireWifi: RequireWifi
+                                )
+                                context.insert(devicePurchased)
+                                try! context.save()
+                                dismiss()
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 #Preview {
     AddDevice()
