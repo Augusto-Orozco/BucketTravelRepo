@@ -46,12 +46,12 @@ struct AddDevice: View {
                     .navigationBarTitleDisplayMode(.large)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading){
-                            Button("Cancel") {
+                            Button("Cancel", systemImage: "multiply") {
                                 dismiss()
                             }
                         }
                         ToolbarItem(placement: .topBarTrailing){
-                            Button("Save") {
+                            Button("Save", systemImage: "chevron.right") {
                                 let devicePurchased = Devices(
                                     name: name,
                                     dateAdded: dateAdded,

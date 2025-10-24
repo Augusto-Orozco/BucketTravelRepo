@@ -44,12 +44,12 @@ struct UpdateDevice: View {
                     .navigationBarTitleDisplayMode( .large)
                     .toolbar{
                         ToolbarItem(placement: .topBarLeading){
-                            Button("Cancel"){
+                            Button("Cancel", systemImage: "multiply"){
                                 dismiss()
                             }
                         }
                         ToolbarItem(placement: .topBarTrailing){
-                            Button("Done"){
+                            Button("Done", systemImage: "chevron.right"){
                                 try! context.save()
                                 dismiss()
                             }
