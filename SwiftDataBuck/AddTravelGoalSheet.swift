@@ -44,6 +44,7 @@ struct AddTravelGoalSheet: View {
                         dismiss()
                     }
                 }
+                
             }
         }
     }
