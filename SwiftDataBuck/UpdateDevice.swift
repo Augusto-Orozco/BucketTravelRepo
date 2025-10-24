@@ -24,7 +24,7 @@ struct UpdateDevice: View {
                 TextField("Type of device", text: $devicePurchased.typeOf)
                 Toggle("Require Wifi", isOn: $devicePurchased.requireWifi)
             }
-            .navigationTitle("Update Travel Goal")
+            .navigationTitle("Update Devices")
             .navigationBarTitleDisplayMode( .large)
             .toolbar{
                 ToolbarItem(placement: .topBarLeading){
