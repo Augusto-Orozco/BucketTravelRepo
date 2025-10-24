@@ -9,10 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    //var travelgoals : [TravelGoal] = []
     @State private var isShowingItemSheet = false
-    @State private var selectedTravelGoal: TravelGoal? = nil
-    @Query(sort: \TravelGoal.dateAdded) var travelgoals : [TravelGoal]
+    @State private var selectedDevice: Devices? = nil
+    @Query(sort: \Devices.dateAdded) var devices : [Devices]
     @Environment(\.modelContext) private var context
     
     
@@ -20,28 +19,28 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(travelgoals){ travelgoal in
+                ForEach(devices){ devices in
                         Button {
-                            selectedTravelGoal = travelgoal
+                            selectedDevice = devices
                         } label: {
-                            Text(travelgoal.name)
+                            Text(devices.name)
                         }
                         .buttonStyle(.plain)
                     }
                 .onDelete { offsets in
-                    offsets.map { travelgoals[$0] }.forEach(context.delete)
+                    offsets.map { devices[$0] }.forEach(context.delete)
                     try? context.save()
                 }
 
                 }
-                .navigationTitle("Travel Goals")
+                .navigationTitle("Dispositivos")
                 .navigationBarTitleDisplayMode( .large)
                 .sheet(isPresented: $isShowingItemSheet){
-                    AddTravelGoalSheet()
+                    AddDevice()
                 }
                 
-                .sheet(item: $selectedTravelGoal) { travelgoal in
-                    UpdateTravelGoalSheet(travelGoal: travelgoal)
+                .sheet(item: $selectedDevice) { device in
+                    UpdateDevice(devicePurchased: device)
                 }
                 .toolbar{
                     Button("Add", systemImage: "plus"){
@@ -54,5 +53,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [TravelGoal.self], inMemory: true)
+        .modelContainer(for: [Devices.self], inMemory: true)
 }

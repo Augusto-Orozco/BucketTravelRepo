@@ -9,15 +9,17 @@ import Foundation
 import SwiftData
 
 @Model
-class TravelGoal {
+class Devices {
     var name : String
     var dateAdded : Date
-    var visited : Bool
+    var typeOf : String
+    var requireWifi : Bool
     
-    init(name: String, dateAdded: Date, visited: Bool) {
+    init(name: String, dateAdded: Date, typeOf: String, requireWifi: Bool) {
         self.name = name
         self.dateAdded = dateAdded
-        self.visited = visited
+        self.typeOf = typeOf
+        self.requireWifi = requireWifi
     }
     
     static func isValidName(_ name: String ) -> Bool {

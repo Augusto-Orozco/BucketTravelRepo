@@ -14,6 +14,6 @@ struct SwiftDataBuckApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [TravelGoal.self])
+        .modelContainer(for: [Devices.self])
     }
 }

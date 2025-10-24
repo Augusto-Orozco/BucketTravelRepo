@@ -8,20 +8,21 @@
 import SwiftUI
 import SwiftData
 
-struct UpdateTravelGoalSheet: View {
+struct UpdateDevice: View {
     
     @Environment(\.dismiss) private var dismiss
     
     @Environment(\.modelContext) var context
-    @Bindable var travelGoal : TravelGoal
+    @Bindable var devicePurchased : Devices
     
     
     var body: some View {
         NavigationStack {
             Form{
-                TextField("Destination", text: $travelGoal.name)
-                DatePicker("Date", selection: $travelGoal.dateAdded, displayedComponents: .date)
-                Toggle("Visited", isOn: $travelGoal.visited)
+                TextField("Name of the device", text:$devicePurchased.name)
+                DatePicker("Date of purchase", selection: $devicePurchased.dateAdded, displayedComponents: .date)
+                TextField("Type of device", text: $devicePurchased.typeOf)
+                Toggle("Require Wifi", isOn: $devicePurchased.requireWifi)
             }
             .navigationTitle("Update Travel Goal")
             .navigationBarTitleDisplayMode( .large)
