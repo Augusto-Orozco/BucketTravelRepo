@@ -18,7 +18,7 @@ struct ContentView: View {
         NavigationStack {
             ZStack {
                 LinearGradient(
-                    gradient: Gradient(colors: [.gray.opacity(0.5), .white.opacity(0.9)]),
+                    gradient: Gradient(colors: [.gray.opacity(0.1), .black.opacity(0.4)]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -62,8 +62,7 @@ struct ContentView: View {
                         .multilineTextAlignment(.leading)
                 }
             }
-            //.navigationTitle("Dispositivos Wifi")
-            //.navigationBarTitleDisplayMode(.large)
+            
             .sheet(isPresented: $isShowingItemSheet) {
                 AddDevice()
                     .presentationDetents([.medium])
