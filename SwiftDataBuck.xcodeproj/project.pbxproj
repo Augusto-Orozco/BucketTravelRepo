@@ -146,6 +146,9 @@
 			);
 			mainGroup = FBD72D112EA6C933001E494A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FBE3A88A2EBBEA6900D4C3B6 /* XCRemoteSwiftPackageReference "Parse-Swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FBD72D1B2EA6C933001E494A /* Products */;
 			projectDirPath = "";
@@ -452,6 +455,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FBE3A88A2EBBEA6900D4C3B6 /* XCRemoteSwiftPackageReference "Parse-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/parse-community/Parse-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.14.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = FBD72D122EA6C933001E494A /* Project object */;
 }

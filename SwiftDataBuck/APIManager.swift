@@ -3,7 +3,7 @@ import Foundation
 struct APIManager {
     static let shared = APIManager()
     
-    private let baseURL = "https://parseapi.back4app.com/classes/Devices"
+    private let baseURL = "https://parseapi.back4app.com"
     private let appId = "ztw3VfOgUbk3OyFrUBDtX2V708Mz5ajMHUW0lQEu"
     private let apiKey = "LJQqLP1HlqbeqWn8Tb751aCdh7eWuZb66gMjNLOp"
     
