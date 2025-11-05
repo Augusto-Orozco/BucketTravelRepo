@@ -48,7 +48,14 @@ struct ContentView: View {
                         .buttonStyle(.plain)
                     }
                     .onDelete { offsets in
-                        offsets.map { devices[$0] }.forEach(context.delete)
+                        offsets.map { devices[$0] }.forEach { device in
+                            context.delete(device)
+                            if let id = device.objectId {
+                                Task {
+                                    try? await APIManager.shared.deleteDevice(objectId: id)
+                                }
+                            }
+                        }
                         try? context.save()
                     }
                 }
@@ -76,6 +83,18 @@ struct ContentView: View {
                     isShowingItemSheet = true
                 }
             }
+            .task {
+                do {
+                    let remoteDevices = try await APIManager.shared.fetchDevices()
+                    for dev in remoteDevices {
+                        context.insert(dev)
+                    }
+                } catch {
+                    print("Error al obtener datos: \(error)")
+                }
+            }
+
+
         }
     }
 }

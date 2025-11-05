@@ -59,6 +59,10 @@ struct AddDevice: View {
                                     requireWifi: RequireWifi
                                 )
                                 context.insert(devicePurchased)
+                                Task {
+                                    try? await APIManager.shared.addDevice(devicePurchased)
+                                }
+
                                 try! context.save()
                                 dismiss()
                             }

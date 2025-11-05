@@ -51,6 +51,12 @@ struct UpdateDevice: View {
                         ToolbarItem(placement: .topBarTrailing){
                             Button("Done", systemImage: "chevron.right"){
                                 try! context.save()
+                                Task {
+                                    if let id = devicePurchased.objectId {
+                                        try? await APIManager.shared.updateDevice(devicePurchased, objectId: id)
+                                    }
+                                }
+
                                 dismiss()
                             }
                         }

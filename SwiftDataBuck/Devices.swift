@@ -10,6 +10,7 @@ import SwiftData
 
 @Model
 class Devices {
+    var objectId: String? 
     var name : String
     var dateAdded : Date
     var typeOf : String
