@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FBC9BE7D2EBD2E2900047DD7 /* ParseSwift in Frameworks */ = {isa = PBXBuildFile; productRef = FBC9BE7C2EBD2E2900047DD7 /* ParseSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		FBE7678E2EAAC2E900EFD41F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -39,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBC9BE7D2EBD2E2900047DD7 /* ParseSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +95,7 @@
 			);
 			name = SwiftDataBuck;
 			packageProductDependencies = (
+				FBC9BE7C2EBD2E2900047DD7 /* ParseSwift */,
 			);
 			productName = SwiftDataBuck;
 			productReference = FBD72D1A2EA6C933001E494A /* SwiftDataBuck.app */;
@@ -466,6 +472,14 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FBC9BE7C2EBD2E2900047DD7 /* ParseSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FBE3A88A2EBBEA6900D4C3B6 /* XCRemoteSwiftPackageReference "Parse-Swift" */;
+			productName = ParseSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FBD72D122EA6C933001E494A /* Project object */;
 }

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 import ParseSwift
 
 @main
@@ -24,6 +23,5 @@ struct SwiftDataBuckApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [Devices.self])
     }
 }

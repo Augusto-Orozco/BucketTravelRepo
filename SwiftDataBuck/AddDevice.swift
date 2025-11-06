@@ -6,17 +6,17 @@
 //
 
 import SwiftUI
-import SwiftData
 import ParseSwift
 
 struct AddDevice: View {
     
+    var onRefresh: (() async -> Void)? = nil
+    
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) var context
-    @State private var name : String = ""
-    @State private var dateAdded : Date = .now
+    @State private var name: String = ""
+    @State private var dateAdded: Date = .now
     @State private var seleccion: String = ""
-    @State private var RequireWifi : Bool = false
+    @State private var requireWifi: Bool = false
     
     let items = ["Amazon Echo", "Luz", "Enchufe", "TV", "Bocina", "Audifonos", "Consola de Videojuegos"]
     
@@ -38,7 +38,7 @@ struct AddDevice: View {
                                 Text(item)
                             }
                         }
-                        Toggle("Require Wifi", isOn: $RequireWifi)
+                        Toggle("Require Wifi", isOn: $requireWifi)
                     }
                     .scrollContentBackground(.hidden)
                     .background(.ultraThinMaterial)
@@ -53,8 +53,14 @@ struct AddDevice: View {
                         }
                         ToolbarItem(placement: .topBarTrailing) {
                             Button("Save", systemImage: "chevron.right") {
-                                createDeviceOnBack4App()
-                                dismiss()
+                                Task {
+                                    await createDeviceOnBack4App()
+                                    
+                                    if let refresh = onRefresh {
+                                        await refresh()
+                                    }
+                                    dismiss()
+                                }
                             }
                         }
                     }
@@ -63,21 +69,19 @@ struct AddDevice: View {
         }
     }
     
-    // MARK: - Crear el objeto en Back4App
-    func createDeviceOnBack4App() {
-        var device = ParseObject(className: "Devices")
-        device["name"] = name
-        device["dateAdded"] = ["__type": "Date", "iso": ISO8601DateFormatter().string(from: dateAdded)]
-        device["typeOf"] = seleccion
-        device["requireWifi"] = RequireWifi
-        
-        device.save { result in
-            switch result {
-            case .success(let savedDevice):
-                print("✅ Device created successfully: \(savedDevice.objectId ?? "unknown")")
-            case .failure(let error):
-                print("❌ Error creating device:", error)
-            }
+    // MARK: - Crear el objeto en Back4App usando ParseSwift
+    func createDeviceOnBack4App() async {
+        let device = Devices(
+            name: name,
+            dateAdded: dateAdded,
+            typeOf: seleccion,
+            requireWifi: requireWifi
+        )
+
+        do {
+            try await device.save()
+        } catch {
+            print("Error creating device:", error.localizedDescription)
         }
     }
 }
