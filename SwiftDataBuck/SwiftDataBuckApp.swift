@@ -15,11 +15,11 @@ struct SwiftDataBuckApp: App {
     init() {
             ParseSwift.initialize(
                 applicationId: "ztw3VfOgUbk3OyFrUBDtX2V708Mz5ajMHUW0lQEu",
-                clientKey: "CLIENT_KEY",
+                clientKey: "LJQqLP1HlqbeqWn8Tb751aCdh7eWuZb66gMjNLOp",
                 serverURL: URL(string: "https://parseapi.back4app.com")!
             )
         }
-    
+        
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-class Devices {
+class Devices : Identifiable {
     var objectId: String? 
     var name : String
     var dateAdded : Date

@@ -7,11 +7,12 @@
 
 import SwiftUI
 import SwiftData
+import ParseSwift
 
 struct ContentView: View {
     @State private var isShowingItemSheet = false
     @State private var selectedDevice: Devices? = nil
-    @Query(sort: \Devices.dateAdded) var devices : [Devices]
+    @Query(sort: \Devices.dateAdded) var devices: [Devices]
     @Environment(\.modelContext) private var context
     
     var body: some View {
@@ -25,21 +26,20 @@ struct ContentView: View {
                 .ignoresSafeArea()
                 
                 List {
-                    ForEach(devices) { devices in
+                    ForEach(devices) { device in
                         Button {
-                            selectedDevice = devices
+                            selectedDevice = device
                         } label: {
                             HStack {
-                                
-                                Image(systemName: devices.iconForDevice(devices.typeOf))
+                                Image(systemName: device.iconForDevice(device.typeOf))
                                     .foregroundColor(.primary)
                                 
-                                Text(devices.name)
+                                Text(device.name)
                                     .font(.headline)
                                 
                                 Spacer()
                                 
-                                if devices.requireWifi {
+                                if device.requireWifi {
                                     Image(systemName: "wifi")
                                         .foregroundColor(.gray)
                                 }
@@ -48,12 +48,14 @@ struct ContentView: View {
                         .buttonStyle(.plain)
                     }
                     .onDelete { offsets in
+                        // Al eliminar, borrar tanto local como en Back4App
                         offsets.map { devices[$0] }.forEach { device in
+                            // 1️⃣ Borra localmente
                             context.delete(device)
+                            
+                            // 2️⃣ Borra en Back4App usando ParseSwift
                             if let id = device.objectId {
-                                Task {
-                                    try? await APIManager.shared.deleteDevice(objectId: id)
-                                }
+                                deleteDeviceOnBack4App(objectId: id)
                             }
                         }
                         try? context.save()
@@ -61,6 +63,7 @@ struct ContentView: View {
                 }
                 .scrollContentBackground(.hidden)
             }
+            
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("My Devices")
@@ -83,18 +86,72 @@ struct ContentView: View {
                     isShowingItemSheet = true
                 }
             }
+            
+            // 🔄 Cargar datos desde Back4App al iniciar
             .task {
-                do {
-                    let remoteDevices = try await APIManager.shared.fetchDevices()
-                    for dev in remoteDevices {
-                        context.insert(dev)
-                    }
-                } catch {
-                    print("Error al obtener datos: \(error)")
-                }
+                queryDevicesFromBack4App()
             }
-
-
+        }
+    }
+    
+    // MARK: - Leer objetos (Read)
+    func queryDevicesFromBack4App() {
+        let query = ParseQuery(className: "Devices")
+        query.find { result in
+            switch result {
+            case .success(let foundDevices):
+                print("✅ Found \(foundDevices.count) devices in Back4App.")
+                
+                for deviceObj in foundDevices {
+                    let name = deviceObj["name"] as? String ?? "Unnamed"
+                    let typeOf = deviceObj["typeOf"] as? String ?? ""
+                    let requireWifi = deviceObj["requireWifi"] as? Bool ?? false
+                    var dateAdded = Date()
+                    
+                    // Manejar fecha si viene en formato Parse
+                    if let dateDict = deviceObj["dateAdded"] as? [String: String],
+                       let iso = dateDict["iso"],
+                       let parsed = ISO8601DateFormatter().date(from: iso) {
+                        dateAdded = parsed
+                    }
+                    
+                    // Crear objeto local SwiftData
+                    let dev = Devices(
+                        name: name,
+                        dateAdded: dateAdded,
+                        typeOf: typeOf,
+                        requireWifi: requireWifi
+                    )
+                    dev.objectId = deviceObj.objectId
+                    
+                    context.insert(dev)
+                }
+                try? context.save()
+                
+            case .failure(let error):
+                print("❌ Error fetching devices:", error)
+            }
+        }
+    }
+    
+    // MARK: - Eliminar objeto (Delete)
+    func deleteDeviceOnBack4App(objectId: String) {
+        let query = ParseQuery(className: "Devices").where("objectId" == objectId)
+        
+        query.first { result in
+            switch result {
+            case .success(let device):
+                device.delete { deleteResult in
+                    switch deleteResult {
+                    case .success:
+                        print("🗑️ Deleted device \(objectId) successfully.")
+                    case .failure(let error):
+                        print("❌ Error deleting device:", error)
+                    }
+                }
+            case .failure(let error):
+                print("❌ Error finding device to delete:", error)
+            }
         }
     }
 }

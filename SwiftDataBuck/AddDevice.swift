@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import ParseSwift
 
 struct AddDevice: View {
     
@@ -27,10 +28,10 @@ struct AddDevice: View {
                 .blur(radius: 5)
                 .opacity(0.6)
             
-            NavigationStack{
-                VStack(spacing: 15){
+            NavigationStack {
+                VStack(spacing: 15) {
                     Form {
-                        TextField("Name of the device", text:$name)
+                        TextField("Name of the device", text: $name)
                         DatePicker("Date of purchase", selection: $dateAdded, displayedComponents: .date)
                         Picker("Dispositivo", selection: $seleccion) {
                             ForEach(items, id: \.self) { item in
@@ -45,25 +46,14 @@ struct AddDevice: View {
                     .navigationTitle("Add Device")
                     .navigationBarTitleDisplayMode(.large)
                     .toolbar {
-                        ToolbarItem(placement: .topBarLeading){
+                        ToolbarItem(placement: .topBarLeading) {
                             Button("Cancel", systemImage: "multiply") {
                                 dismiss()
                             }
                         }
-                        ToolbarItem(placement: .topBarTrailing){
+                        ToolbarItem(placement: .topBarTrailing) {
                             Button("Save", systemImage: "chevron.right") {
-                                let devicePurchased = Devices(
-                                    name: name,
-                                    dateAdded: dateAdded,
-                                    typeOf: seleccion,
-                                    requireWifi: RequireWifi
-                                )
-                                context.insert(devicePurchased)
-                                Task {
-                                    try? await APIManager.shared.addDevice(devicePurchased)
-                                }
-
-                                try! context.save()
+                                createDeviceOnBack4App()
                                 dismiss()
                             }
                         }
@@ -72,8 +62,25 @@ struct AddDevice: View {
             }
         }
     }
+    
+    // MARK: - Crear el objeto en Back4App
+    func createDeviceOnBack4App() {
+        var device = ParseObject(className: "Devices")
+        device["name"] = name
+        device["dateAdded"] = ["__type": "Date", "iso": ISO8601DateFormatter().string(from: dateAdded)]
+        device["typeOf"] = seleccion
+        device["requireWifi"] = RequireWifi
+        
+        device.save { result in
+            switch result {
+            case .success(let savedDevice):
+                print("✅ Device created successfully: \(savedDevice.objectId ?? "unknown")")
+            case .failure(let error):
+                print("❌ Error creating device:", error)
+            }
+        }
+    }
 }
-
 
 #Preview {
     AddDevice()
