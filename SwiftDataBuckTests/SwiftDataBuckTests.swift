@@ -17,7 +17,6 @@ struct SwiftDataBuckTests {
         #expect(!Devices.isValidName(""))
         #expect(!Devices.isValidName(" "))
         
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
     }
     
     @Test("Device update must correctly modify all properties and validate name")
