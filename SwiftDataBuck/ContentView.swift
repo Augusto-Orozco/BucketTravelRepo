@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-import SwiftData
+import ParseSwift
 
 struct ContentView: View {
     @State private var isShowingItemSheet = false
     @State private var selectedDevice: Devices? = nil
-    @Query(sort: \Devices.dateAdded) var devices : [Devices]
-    @Environment(\.modelContext) private var context
+    @State private var devices: [Devices] = []
     
     var body: some View {
         NavigationStack {
@@ -25,21 +24,20 @@ struct ContentView: View {
                 .ignoresSafeArea()
                 
                 List {
-                    ForEach(devices) { devices in
+                    ForEach(devices, id: \.objectId) { device in
                         Button {
-                            selectedDevice = devices
+                            selectedDevice = device
                         } label: {
                             HStack {
-                                
-                                Image(systemName: devices.iconForDevice(devices.typeOf))
+                                Image(systemName: device.iconForDevice(device.typeOf ?? ""))
                                     .foregroundColor(.primary)
                                 
-                                Text(devices.name)
+                                Text(device.name ?? "Unnamed")
                                     .font(.headline)
                                 
                                 Spacer()
                                 
-                                if devices.requireWifi {
+                                if device.requireWifi ?? false {
                                     Image(systemName: "wifi")
                                         .foregroundColor(.gray)
                                 }
@@ -47,33 +45,61 @@ struct ContentView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .onDelete { offsets in
-                        offsets.map { devices[$0] }.forEach(context.delete)
-                        try? context.save()
-                    }
+                    .onDelete(perform: deleteDevice)
                 }
                 .scrollContentBackground(.hidden)
             }
+            
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("My Devices")
                         .font(.largeTitle)
                         .bold()
-                        .multilineTextAlignment(.leading)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add", systemImage: "plus") {
+                        isShowingItemSheet = true
+                    }
                 }
             }
-            
             .sheet(isPresented: $isShowingItemSheet) {
-                AddDevice()
+                AddDevice(onRefresh: {
+                    await queryDevicesFromBack4App()
+                })
                     .presentationDetents([.medium])
             }
             .sheet(item: $selectedDevice) { device in
-                UpdateDevice(devicePurchased: device)
+                UpdateDevice(onRefresh: {
+                    await queryDevicesFromBack4App()
+                }, devicePurchased: device)
                     .presentationDetents([.medium])
             }
-            .toolbar {
-                Button("Add", systemImage: "plus") {
-                    isShowingItemSheet = true
+            .task {
+                await queryDevicesFromBack4App()
+            }
+        }
+    }
+    
+    // MARK: - Leer (Read)
+    func queryDevicesFromBack4App() async {
+        do {
+            let foundDevices = try await Devices.query().find()
+            devices = foundDevices
+        } catch {
+            print("Error fetching devices:", error.localizedDescription)
+        }
+    }
+    
+    // MARK: - Eliminar (Delete)
+    func deleteDevice(at offsets: IndexSet) {
+        for index in offsets {
+            let device = devices[index]
+            Task {
+                do {
+                    try await device.delete()
+                    devices.remove(at: index)
+                } catch {
+                    print("Error deleting:", error.localizedDescription)
                 }
             }
         }
@@ -82,5 +108,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [Devices.self], inMemory: true)
 }

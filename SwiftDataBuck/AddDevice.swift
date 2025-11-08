@@ -6,16 +6,17 @@
 //
 
 import SwiftUI
-import SwiftData
+import ParseSwift
 
 struct AddDevice: View {
     
+    var onRefresh: (() async -> Void)? = nil
+    
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) var context
-    @State private var name : String = ""
-    @State private var dateAdded : Date = .now
+    @State private var name: String = ""
+    @State private var dateAdded: Date = .now
     @State private var seleccion: String = ""
-    @State private var RequireWifi : Bool = false
+    @State private var requireWifi: Bool = false
     
     let items = ["Amazon Echo", "Luz", "Enchufe", "TV", "Bocina", "Audifonos", "Consola de Videojuegos"]
     
@@ -27,17 +28,17 @@ struct AddDevice: View {
                 .blur(radius: 5)
                 .opacity(0.6)
             
-            NavigationStack{
-                VStack(spacing: 15){
+            NavigationStack {
+                VStack(spacing: 15) {
                     Form {
-                        TextField("Name of the device", text:$name)
+                        TextField("Name of the device", text: $name)
                         DatePicker("Date of purchase", selection: $dateAdded, displayedComponents: .date)
                         Picker("Dispositivo", selection: $seleccion) {
                             ForEach(items, id: \.self) { item in
                                 Text(item)
                             }
                         }
-                        Toggle("Require Wifi", isOn: $RequireWifi)
+                        Toggle("Require Wifi", isOn: $requireWifi)
                     }
                     .scrollContentBackground(.hidden)
                     .background(.ultraThinMaterial)
@@ -45,22 +46,21 @@ struct AddDevice: View {
                     .navigationTitle("Add Device")
                     .navigationBarTitleDisplayMode(.large)
                     .toolbar {
-                        ToolbarItem(placement: .topBarLeading){
+                        ToolbarItem(placement: .topBarLeading) {
                             Button("Cancel", systemImage: "multiply") {
                                 dismiss()
                             }
                         }
-                        ToolbarItem(placement: .topBarTrailing){
+                        ToolbarItem(placement: .topBarTrailing) {
                             Button("Save", systemImage: "chevron.right") {
-                                let devicePurchased = Devices(
-                                    name: name,
-                                    dateAdded: dateAdded,
-                                    typeOf: seleccion,
-                                    requireWifi: RequireWifi
-                                )
-                                context.insert(devicePurchased)
-                                try! context.save()
-                                dismiss()
+                                Task {
+                                    await createDeviceOnBack4App()
+                                    
+                                    if let refresh = onRefresh {
+                                        await refresh()
+                                    }
+                                    dismiss()
+                                }
                             }
                         }
                     }
@@ -68,8 +68,23 @@ struct AddDevice: View {
             }
         }
     }
-}
+    
+    // MARK: - Crear el objeto en Back4App usando ParseSwift
+    func createDeviceOnBack4App() async {
+        let device = Devices(
+            name: name,
+            dateAdded: dateAdded,
+            typeOf: seleccion,
+            requireWifi: requireWifi
+        )
 
+        do {
+            try await device.save()
+        } catch {
+            print("Error creating device:", error.localizedDescription)
+        }
+    }
+}
 
 #Preview {
     AddDevice()
