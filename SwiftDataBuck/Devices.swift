@@ -17,7 +17,7 @@ struct Devices: ParseObject, Identifiable {
     var updatedAt: Date?
     var ACL: ParseACL?
 
-    // MARK: - Campos personalizados (tus datos)
+    // MARK: - Campos personalizados
     var name: String?
     var dateAdded: Date?
     var typeOf: String?
@@ -27,7 +27,7 @@ struct Devices: ParseObject, Identifiable {
     static var className = "Devices"
 
     // MARK: - Inicializadores
-    init() { }  // Necesario para ParseSwift (decodificación)
+    init() { }
     
     init(name: String, dateAdded: Date, typeOf: String, requireWifi: Bool) {
         self.name = name
